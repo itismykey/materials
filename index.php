@@ -26,8 +26,18 @@ if (isset($_POST['login_user'], $_POST['login_pass']) &&
 $admin_mode = isset($_SESSION['admin']) && $_SESSION['admin'] === true;
 
 if ($admin_mode && isset($_POST['add'])) {
-    $stmt = $mysqli->prepare("INSERT INTO materials (Type, DeviceName, Specification, PartNumber, Barcode, Status, Location, Owner) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssssss", $_POST['Type'], $_POST['DeviceName'], $_POST['Specification'], $_POST['PartNumber'], $_POST['Barcode'], $_POST['Status'], $_POST['Location'], $_POST['Owner']);
+    $ReceiptDate = isset($_POST['ReceiptDate']) ? $_POST['ReceiptDate'] : '';
+    $Type = isset($_POST['Type']) ? $_POST['Type'] : '';
+    $DeviceName = isset($_POST['DeviceName']) ? $_POST['DeviceName'] : '';
+    $Specification = isset($_POST['Specification']) ? $_POST['Specification'] : '';
+    $PartNumber = isset($_POST['PartNumber']) ? $_POST['PartNumber'] : '';
+    $Barcode = isset($_POST['Barcode']) ? $_POST['Barcode'] : '';
+    $Status = isset($_POST['Status']) ? $_POST['Status'] : '';
+    $Location = isset($_POST['Location']) ? $_POST['Location'] : '';
+    $Owner = isset($_POST['Owner']) ? $_POST['Owner'] : '';
+
+    $stmt = $mysqli->prepare("INSERT INTO materials (ReceiptDate, Type, DeviceName, Specification, PartNumber, Barcode, Status, Location, Owner) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssssss", $ReceiptDate, $Type, $DeviceName, $Specification, $PartNumber, $Barcode, $Status, $Location, $Owner);
     $stmt->execute();
 }
 
@@ -43,7 +53,7 @@ $types = '';
 
 if (isset($_GET['search']) && isset($_GET['keyword']) && trim($_GET['keyword']) !== '') {
     $keyword = '%' . trim($_GET['keyword']) . '%';
-    $fields = array('DeviceName', 'PartNumber', 'Location');
+    $fields = array('ReceiptDate', 'DeviceName', 'PartNumber', 'Location');
 
     foreach ($fields as $field) {
         if (isset($_GET['field_' . $field])) {
@@ -128,6 +138,7 @@ if ($stmt) {
 <?php if ($admin_mode): ?>
 <form method="post" class="admin-form">
     <h3>➕ 新增物料資料</h3>
+    Receipt Date: <input name="ReceiptDate" type="date" required />
     Type: <input name="Type" required />
     DeviceName: <input name="DeviceName" required />
     Specification: <input name="Specification" required />
@@ -143,6 +154,7 @@ if ($stmt) {
 <form method="get" class="search-box">
     <strong>🔍 搜尋：</strong>
     關鍵字：<input type="text" name="keyword" value="<?php echo isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : ''; ?>" />
+    <label><input type="checkbox" name="field_ReceiptDate" <?php if (isset($_GET['field_ReceiptDate'])) echo 'checked'; ?>> ReceiptDate</label>
     <label><input type="checkbox" name="field_DeviceName" <?php if (isset($_GET['field_DeviceName'])) echo 'checked'; ?>> DeviceName</label>
     <label><input type="checkbox" name="field_PartNumber" <?php if (isset($_GET['field_PartNumber'])) echo 'checked'; ?>> PartNumber</label>
     <label><input type="checkbox" name="field_Location" <?php if (isset($_GET['field_Location'])) echo 'checked'; ?>> Location</label>
@@ -154,6 +166,7 @@ if ($stmt) {
 <table>
     <tr>
         <th>ID</th>
+        <th>ReceiptDate</th>
         <th>Type</th>
         <th>DeviceName</th>
         <th>Specification</th>
@@ -167,6 +180,7 @@ if ($stmt) {
     <?php foreach ($data as $row): ?>
         <tr>
             <td><?php echo $row['id']; ?></td>
+            <td><?php echo htmlspecialchars($row['ReceiptDate']); ?></td>
             <td><?php echo htmlspecialchars($row['Type']); ?></td>
             <td><?php echo htmlspecialchars($row['DeviceName']); ?></td>
             <td><?php echo htmlspecialchars($row['Specification']); ?></td>
