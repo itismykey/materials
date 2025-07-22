@@ -37,7 +37,7 @@ if ($admin_mode && isset($_POST['add'])) {
     $Owner = isset($_POST['Owner']) ? $_POST['Owner'] : '';
 
     $stmt = $mysqli->prepare("INSERT INTO materials (ReceiptDate, Type, DeviceName, Specification, PartNumber, Barcode, Status, Location, Owner) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssssssss", $ReceiptDate, $Type, $DeviceName, $Specification, $PartNumber, $Barcode, $Status, $Location, $Owner);
+    $stmt->bind_param("sssssssss", $ReceiptDate, $Type, $DeviceName, $Specification, $PartNumber, $Barcode, $Status, $Location, $c);
     $stmt->execute();
 }
 
@@ -54,7 +54,7 @@ $types = '';
 if (isset($_GET['search']) && isset($_GET['keyword']) && trim($_GET['keyword']) !== '') {
     $keyword = '%' . trim($_GET['keyword']) . '%';
     $fields = array('ReceiptDate', 'DeviceName', 'PartNumber', 'Location');
-
+	$fields = array('ReceiptDate', 'Type', 'DeviceName', 'Specification', 'PartNumber', 'Barcode', 'Location', 'Owner');
     foreach ($fields as $field) {
         if (isset($_GET['field_' . $field])) {
             $where[] = $field . " LIKE ?";
@@ -158,6 +158,10 @@ if ($stmt) {
     <label><input type="checkbox" name="field_DeviceName" <?php if (isset($_GET['field_DeviceName'])) echo 'checked'; ?>> DeviceName</label>
     <label><input type="checkbox" name="field_PartNumber" <?php if (isset($_GET['field_PartNumber'])) echo 'checked'; ?>> PartNumber</label>
     <label><input type="checkbox" name="field_Location" <?php if (isset($_GET['field_Location'])) echo 'checked'; ?>> Location</label>
+    <label><input type="checkbox" name="field_Type" <?php if (isset($_GET['field_Type'])) echo 'checked'; ?>> Type</label>
+    <label><input type="checkbox" name="field_Specification" <?php if (isset($_GET['field_Specification'])) echo 'checked'; ?>> Specification</label>
+    <label><input type="checkbox" name="field_Barcode" <?php if (isset($_GET['field_Barcode'])) echo 'checked'; ?>> Barcode</label>
+    <label><input type="checkbox" name="field_Owner" <?php if (isset($_GET['field_Owner'])) echo 'checked'; ?>> Owner</label>
     <button class="btn" name="search">搜尋</button>
 </form>
 
