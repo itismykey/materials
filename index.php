@@ -26,8 +26,8 @@ if (isset($_POST['login_user'], $_POST['login_pass']) &&
 $admin_mode = isset($_SESSION['admin']) && $_SESSION['admin'] === true;
 
 if ($admin_mode && isset($_POST['add'])) {
-    $stmt = $mysqli->prepare("INSERT INTO materials (SampleName, Quantity, Program, Recipient) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("siss", $_POST['SampleName'], $_POST['Quantity'], $_POST['Program'], $_POST['Recipient']);
+    $stmt = $mysqli->prepare("INSERT INTO materials (Type, DeviceName, Specification, PartNumber, Barcode, Status, Location, Owner) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssssss", $_POST['Type'], $_POST['DeviceName'], $_POST['Specification'], $_POST['PartNumber'], $_POST['Barcode'], $_POST['Status'], $_POST['Location'], $_POST['Owner']);
     $stmt->execute();
 }
 
@@ -37,19 +37,18 @@ if ($admin_mode && isset($_GET['delete'])) {
     $stmt->execute();
 }
 
-// 搜尋處理
 $where = array();
 $values = array();
 $types = '';
 
 if (isset($_GET['search']) && isset($_GET['keyword']) && trim($_GET['keyword']) !== '') {
     $keyword = '%' . trim($_GET['keyword']) . '%';
-    $fields = array('SampleName', 'Program', 'Recipient');
+    $fields = array('DeviceName', 'PartNumber', 'Location');
 
     foreach ($fields as $field) {
         if (isset($_GET['field_' . $field])) {
             $where[] = $field . " LIKE ?";
-            $values[] = &$keyword;  // 用&來引用變數
+            $values[] = &$keyword;
             $types .= 's';
         }
     }
@@ -63,13 +62,11 @@ $query .= " ORDER BY id DESC";
 
 $stmt = $mysqli->prepare($query);
 if (count($values) > 0) {
-    // 使用call_user_func_array來綁定參數
     call_user_func_array(array($stmt, 'bind_param'), array_merge(array($types), $values));
 }
 
 $stmt->execute();
 
-// 確保$stmt是有效對象
 if ($stmt) {
     $result = $stmt->get_result();
     $data = array();
@@ -80,7 +77,6 @@ if ($stmt) {
 } else {
     die('SQL執行錯誤');
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -132,21 +128,24 @@ if ($stmt) {
 <?php if ($admin_mode): ?>
 <form method="post" class="admin-form">
     <h3>➕ 新增物料資料</h3>
-    SampleName: <input name="SampleName" required />
-    Quantity: <input name="Quantity" type="number" required />
-    Program: <input name="Program" required />
-    Recipient: <input name="Recipient" required />
+    Type: <input name="Type" required />
+    DeviceName: <input name="DeviceName" required />
+    Specification: <input name="Specification" required />
+    PartNumber: <input name="PartNumber" required />
+    Barcode: <input name="Barcode" required />
+    Status: <input name="Status" required />
+    Location: <input name="Location" required />
+    Owner: <input name="Owner" required />
     <button name="add" class="btn">新增</button>
 </form>
 <?php endif; ?>
 
-<!-- 🔍 搜尋功能 -->
 <form method="get" class="search-box">
     <strong>🔍 搜尋：</strong>
     關鍵字：<input type="text" name="keyword" value="<?php echo isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : ''; ?>" />
-    <label><input type="checkbox" name="field_SampleName" <?php if (isset($_GET['field_SampleName'])) echo 'checked'; ?>> SampleName</label>
-    <label><input type="checkbox" name="field_Program" <?php if (isset($_GET['field_Program'])) echo 'checked'; ?>> Program</label>
-    <label><input type="checkbox" name="field_Recipient" <?php if (isset($_GET['field_Recipient'])) echo 'checked'; ?>> Recipient</label>
+    <label><input type="checkbox" name="field_DeviceName" <?php if (isset($_GET['field_DeviceName'])) echo 'checked'; ?>> DeviceName</label>
+    <label><input type="checkbox" name="field_PartNumber" <?php if (isset($_GET['field_PartNumber'])) echo 'checked'; ?>> PartNumber</label>
+    <label><input type="checkbox" name="field_Location" <?php if (isset($_GET['field_Location'])) echo 'checked'; ?>> Location</label>
     <button class="btn" name="search">搜尋</button>
 </form>
 
@@ -155,31 +154,34 @@ if ($stmt) {
 <table>
     <tr>
         <th>ID</th>
-        <th>SampleName</th>
-        <th>Quantity</th>
-        <th>Program</th>
-        <th>Recipient</th>
+        <th>Type</th>
+        <th>DeviceName</th>
+        <th>Specification</th>
+        <th>PartNumber</th>
+        <th>Barcode</th>
+        <th>Status</th>
+        <th>Location</th>
+        <th>Owner</th>
         <?php if ($admin_mode): ?><th>操作</th><?php endif; ?>
     </tr>
-    <?php if ($row_count > 0): ?>
-        <?php foreach ($data as $row): ?>
-            <tr>
-                <td><?php echo $row['id']; ?></td>
-                <td><?php echo htmlspecialchars($row['SampleName']); ?></td>
-                <td><?php echo $row['Quantity']; ?></td>
-                <td><?php echo htmlspecialchars($row['Program']); ?></td>
-                <td><?php echo htmlspecialchars($row['Recipient']); ?></td>
-                <?php if ($admin_mode): ?>
-                    <td><a href="?delete=<?php echo $row['id']; ?>" class="delete-btn" onclick="return confirm('確定要刪除嗎?')">刪除</a></td>
-                <?php endif; ?>
-            </tr>
-        <?php endforeach; ?>
-    <?php else: ?>
-        <tr><td colspan="<?php echo $admin_mode ? 6 : 5; ?>">查無資料</td></tr>
-    <?php endif; ?>
+    <?php foreach ($data as $row): ?>
+        <tr>
+            <td><?php echo $row['id']; ?></td>
+            <td><?php echo htmlspecialchars($row['Type']); ?></td>
+            <td><?php echo htmlspecialchars($row['DeviceName']); ?></td>
+            <td><?php echo htmlspecialchars($row['Specification']); ?></td>
+            <td><?php echo htmlspecialchars($row['PartNumber']); ?></td>
+            <td><?php echo htmlspecialchars($row['Barcode']); ?></td>
+            <td><?php echo htmlspecialchars($row['Status']); ?></td>
+            <td><?php echo htmlspecialchars($row['Location']); ?></td>
+            <td><?php echo htmlspecialchars($row['Owner']); ?></td>
+            <?php if ($admin_mode): ?>
+                <td><a href="?delete=<?php echo $row['id']; ?>" class="delete-btn" onclick="return confirm('確定要刪除嗎?')">刪除</a></td>
+            <?php endif; ?>
+        </tr>
+    <?php endforeach; ?>
 </table>
 
-<!-- 登入視窗 -->
 <div id="loginBox" class="login-overlay" style="display:none;">
     <form method="post" class="login-box">
         <h3>🔐 管理登入</h3>
