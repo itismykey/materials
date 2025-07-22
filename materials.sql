@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- 主机: localhost
--- 生成日期: 2025 年 07 月 22 日 16:30
+-- 生成日期: 2025 年 07 月 23 日 01:18
 -- 服务器版本: 5.5.20
 -- PHP 版本: 5.3.9
 
@@ -38,16 +38,16 @@ CREATE TABLE IF NOT EXISTS `materials` (
   `Location` varchar(255) NOT NULL,
   `Owner` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=7 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=9 ;
 
 --
 -- 转存表中的数据 `materials`
 --
 
 INSERT INTO `materials` (`id`, `ReceiptDate`, `Type`, `DeviceName`, `Specification`, `PartNumber`, `Barcode`, `Status`, `Location`, `Owner`) VALUES
-(3, '0000-00-00', 'GPU', 'Navi48', 'G29502 Board A0 XTX AiB Typical/Corner Samsung', '102-G29502-00', 'NA', 'On rock', 'C1-3', 'Roger Chang'),
-(4, '0000-00-00', 'GPU', 'Navi48', 'G29502 Board A0 XTX AiB Typical/Corner Samsung', '102-G29502-00', 'NA', 'AI deployment', 'C4-3', 'James Sung'),
-(6, '0000-00-00', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A');
+(3, '2025-07-01', 'GPU', 'Navi48', 'G29502 Board A0 XTX AiB Typical/Corner Samsung', '102-G29502-00', 'NA', 'On rock', 'C1-3', 'Roger Chang'),
+(4, '2025-01-01', 'GPU', 'Navi48', 'G29502 Board A0 XTX AiB Typical/Corner Samsung', '102-G29502-00', 'NA', 'AI deployment', 'C4-3', 'James Sung'),
+(8, '2025-07-01', 'CPU', 'HPT', 'FP8 ', '102-0000-01', 'NA', 'NA', 'NA', 'Roger Chang');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
